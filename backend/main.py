@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from rag_manual import retrieve
+# from rag_manual import retrieve
 from rag_langchain import retrieve
 from LLM import generate_answer
 from dotenv import load_dotenv
