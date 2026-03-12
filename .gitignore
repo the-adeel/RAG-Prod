@@ -12,6 +12,8 @@ env/
 # Node modules
 node_modules/
 
+uploads/
+
 # Logs
 *.log
 npm-debug.log*

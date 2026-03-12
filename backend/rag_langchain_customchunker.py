@@ -7,7 +7,7 @@ from langchain_community.document_loaders import UnstructuredWordDocumentLoader
 import os
 
 embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-base-en")
-splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
+# splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
 
 def load_documents(folder="uploads"):
     docs = []
@@ -18,6 +18,15 @@ def load_documents(folder="uploads"):
         with open(path, "r", encoding="utf-8") as f:
             docs.append(f.read())
     return docs
+
+def chunk_text(text, chunk_size=200, overlap=50):
+    words = text.split()
+    chunks = []
+    step = chunk_size - overlap
+    for i in range(0, len(words), step):
+        chunk = " ".join(words[i:i+chunk_size])
+        chunks.append(chunk)
+    return chunks
 
 def add_file_to_vectorstore(file_path):
     global vectorstore
@@ -37,7 +46,7 @@ def add_file_to_vectorstore(file_path):
     documents = loader.load()
     all_chunks = []
     for doc in documents:
-        all_chunks.extend(splitter.split_text(doc.page_content))
+        all_chunks.extend(chunk_text(doc.page_content))
 
     # Create a new vector store every time
     vectorstore = FAISS.from_texts(all_chunks, embeddings)
