@@ -8,7 +8,7 @@ import os
 
 embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-base-en")
 splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
-
+vectorstore = None
 def load_documents(folder="uploads"):
     docs = []
 
@@ -41,12 +41,13 @@ def add_file_to_vectorstore(file_path):
 
     # Create a new vector store every time
     vectorstore = FAISS.from_texts(all_chunks, embeddings)
-    vectorstore.save_local("vectorstore")
 
     return f"File '{file_path}' added to vector store successfully."
 
 # retrieval
 def retrieve(query, k=2):
+    if vectorstore is None:
+        return []
     docs = vectorstore.similarity_search(query, k=k)
     results = [doc.page_content for doc in docs]
     return results

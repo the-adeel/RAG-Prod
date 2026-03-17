@@ -17,11 +17,16 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 def ask(query: str):
 
     context = retrieve(query)
-    answer = generate_answer(query, context)
+    if not context:
+        answer = generate_answer(query, context=[])
+
+    else:
+        answer = generate_answer(query, context)
 
     return {
         "query": query,
-        "context": context,
+        "used_rag": bool(context),
+        "context_snippets": context,
         "answer": answer
     }
 

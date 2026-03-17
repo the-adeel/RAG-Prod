@@ -8,22 +8,28 @@ client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
 def generate_answer(query, context):
+    if not context:
+        prompt = f"""
+You are a helpful AI assistant.
+Answer the following question clearly and naturally.
 
-    context_text = "\n".join(context)
+Question: {query}
+"""
+    else:
+        context_text = "\n\n".join(context)
+        prompt = f"""
+Use the context below to answer the question.
+If the context doesn't contain the answer, say so — don't make things up.
 
-    prompt = f"""
-    Use the context below to answer the question.
+Context:
+{context_text}
 
-    Context:
-    {context_text}
-
-    Question:
-    {query}
-    """
-
+Question:
+{query}
+"""
     completion = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": prompt.strip()}]
     )
 
     return completion.choices[0].message.content
