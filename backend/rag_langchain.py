@@ -5,10 +5,12 @@ from langchain_community.document_loaders import TextLoader
 from langchain_community.document_loaders import UnstructuredPDFLoader
 from langchain_community.document_loaders import UnstructuredWordDocumentLoader
 import os
+from rerank import rerank
 
 embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-base-en")
 splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
 vectorstore = None
+
 def load_documents(folder="uploads"):
     docs = []
 
@@ -44,10 +46,12 @@ def add_file_to_vectorstore(file_path):
 
     return f"File '{file_path}' added to vector store successfully."
 
+
 # retrieval
 def retrieve(query, k=2):
     if vectorstore is None:
         return []
-    docs = vectorstore.similarity_search(query, k=k)
+    docs = vectorstore.similarity_search(query, k=k*3)
     results = [doc.page_content for doc in docs]
-    return results
+    final_results = rerank(query, results, top_k=k)
+    return final_results
