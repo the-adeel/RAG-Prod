@@ -1,14 +1,15 @@
 from fastapi import FastAPI, UploadFile, File
 # from rag_manual import retrieve
-from rag_langchain import retrieve
-from LLM import generate_answer
+from functions.rag_langchain import retrieve
+from functions.LLM import generate_answer
 from dotenv import load_dotenv
-from rag_langchain import add_file_to_vectorstore
+from functions.rag_langchain import add_file_to_vectorstore
+from helpers.lifespan import lifespan
 import shutil
 import os
 
 load_dotenv()
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)

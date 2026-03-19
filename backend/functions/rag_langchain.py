@@ -5,7 +5,7 @@ from langchain_community.document_loaders import TextLoader
 from langchain_community.document_loaders import UnstructuredPDFLoader
 from langchain_community.document_loaders import UnstructuredWordDocumentLoader
 import os
-from rerank import rerank
+from .rerank import rerank
 
 embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-base-en")
 splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
