@@ -15,20 +15,26 @@ UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.get("/ask")
-def ask(query: str):
+async def ask(query: str):
+    context = await retrieve(query)
 
-    context = retrieve(query)
-    if not context:
-        answer = generate_answer(query, context=[])
+    answer = generate_answer(query, context)
 
-    else:
-        answer = generate_answer(query, context)
+    # Extract sources cleanly
+    sources = [
+        {
+            "document": c.get("document", "Unknown"),
+            "chunk_index": c.get("chunk_index")
+        }
+        for c in context
+    ]
 
     return {
         "query": query,
         "used_rag": bool(context),
-        "context_snippets": context,
-        "answer": answer
+        "answer": answer,
+        "sources": sources,           # ← clean references
+        "context_snippets": [c["content"] for c in context]  # optional
     }
 
 @app.post("/upload")
@@ -40,6 +46,6 @@ async def upload_file(file: UploadFile = File(...)):
         shutil.copyfileobj(file.file, buffer)
 
     # Overwrite vector store with only this file
-    result = add_file_to_vectorstore(file_path)
+    result = await add_file_to_vectorstore(file_path)
 
     return {"message": result}
